@@ -27,7 +27,7 @@ LINUX_DTSI		?= $(LINUX_PATH)/arch/arm64/boot/dts/rockchip/rk3588-nanopi6-common.
 UBOOT_HEADER		?= $(UBOOT_PATH)/include/configs/nanopi6.h
 UBOOT_FIT		?= $(UBOOT_PATH)/arch/arm/mach-rockchip/fit_wrapper.sh
 
-LINUX_MODULES ?= n
+LINUX_MODULES ?= y
 
 BR2_TARGET_ROOTFS_CPIO = n
 BR2_TARGET_ROOTFS_CPIO_GZIP = n
@@ -36,6 +36,7 @@ BR2_TARGET_ROOTFS_EXT2 = y
 # Reference: https://wiki.friendlyelec.com/wiki/index.php/NanoPC-T6#NanoPC-T6
 BR2_TARGET_GENERIC_GETTY_PORT = tty1
 ifeq ($(LINUX_MODULES),y)
+BR2_PACKAGE_MODULE_AUTOLOAD = y
 # If modules are installed...
 # ...enable automatic device detection and driver loading
 BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV = y
@@ -52,8 +53,15 @@ BR2_ROOTFS_POST_BUILD_SCRIPT = $(ROOT)/build/br-ext/board/nanopc-t6/post-build.s
 BR2_PACKAGE_NTP = y
 BR2_PACKAGE_NTP_NTPD = y
 else
+BR2_PACKAGE_IFUPDOWN_SCRIPTS = y
+BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV = y
+BR2_SYSTEM_DHCP = enP2p33s0
 BR2_TARGET_ROOTFS_EXT2_SIZE = 112M
+BR2_PACKAGE_OPENSSH = y
+BR2_PACKAGE_OPENSSH_SERVER = y
+BR2_ROOTFS_POST_BUILD_SCRIPT = $(ROOT)/build/br-ext/board/nanopc-t6/post-build.sh
 endif
+BR2_PACKAGE_LM_SENSORS = y
 
 ################################################################################
 # Targets
@@ -176,6 +184,7 @@ linux: linux-common linux-apply-dtso
 ifeq ($(LINUX_MODULES),y)
 	$(MAKE) -C $(LINUX_PATH) ARCH=arm64 modules_install \
 		INSTALL_MOD_PATH=$(BINARIES_PATH)/modules
+	depmod -b $(BINARIES_PATH)/modules -v $$(ls $(BINARIES_PATH)/modules/lib/modules | head -n1)
 endif
 
 $(LINUX_PATH)/arch/arm64/boot/Image.gz: linux
@@ -239,6 +248,8 @@ boot-img: u-boot buildroot $(LINUX_PATH)/arch/arm64/boot/Image.gz
 	e2cp $(LINUX_PATH)/arch/arm64/boot/Image.gz $(ROOT_IMG):/boot
 	e2cp $(LINUX_PATH)/arch/arm64/boot/dts/rockchip/rk3588-nanopi6-rev01.dtb $(ROOT_IMG):/boot
 	e2cp $(LINUX_PATH)/arch/arm64/boot/dts/rockchip/rk3588-nanopi6-optee.dtbo $(ROOT_IMG):/boot
+	e2cp $(ROOT)/build/br-ext/board/nanopc-t6/rtl8125b-2.fw $(ROOT_IMG):/lib/firmware/rtl_nic/
+
 ifeq ($(LINUX_MODULES),y)
 	find $(BINARIES_PATH)/modules -type f | while read f; do e2cp -a $$f $(ROOT_IMG):$$(echo $$f | sed s@$(BINARIES_PATH)/modules@@); done
 endif
