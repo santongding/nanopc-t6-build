@@ -62,6 +62,7 @@ BR2_PACKAGE_OPENSSH_SERVER = y
 BR2_ROOTFS_POST_BUILD_SCRIPT = $(ROOT)/build/br-ext/board/nanopc-t6/post-build.sh
 endif
 BR2_PACKAGE_LM_SENSORS = y
+BR2_PACKAGE_BASH = y
 
 ################################################################################
 # Targets

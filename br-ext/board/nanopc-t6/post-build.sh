@@ -25,6 +25,9 @@ nameserver 1.1.1.1
 EOT
 
 cp $BUILD_DIR/../../build/br-ext/board/nanopc-t6/module-autoload/S02modules $TARGET_DIR/etc/init.d
+cp $BUILD_DIR/../../build/br-ext/board/nanopc-t6/fan/S23pwmfan $TARGET_DIR/etc/init.d
+cp $BUILD_DIR/../../build/br-ext/board/nanopc-t6/fan/fa-fancontrol-direct.sh $TARGET_DIR/usr/bin
+cp $BUILD_DIR/../../build/br-ext/board/nanopc-t6/fan/fa-fancontrol.sh $TARGET_DIR/usr/bin
 mkdir $TARGET_DIR/etc/sysconfig
 cp $BUILD_DIR/../../build/br-ext/board/nanopc-t6/module-autoload/functions $TARGET_DIR/etc/sysconfig/
 cp $BUILD_DIR/../../build/br-ext/board/nanopc-t6/module-autoload/modules $TARGET_DIR/etc/sysconfig/
