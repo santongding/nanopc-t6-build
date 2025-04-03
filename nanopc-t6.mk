@@ -44,7 +44,7 @@ BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_EUDEV = y
 BR2_PACKAGE_IFUPDOWN_SCRIPTS = y
 BR2_SYSTEM_DHCP = enP2p33s0
 # An image with module takes more space
-BR2_TARGET_ROOTFS_EXT2_SIZE = 1536M
+BR2_TARGET_ROOTFS_EXT2_SIZE = 1024M
 # Enable SSH daemon for remote login
 BR2_PACKAGE_OPENSSH = y
 BR2_PACKAGE_OPENSSH_SERVER = y
@@ -63,7 +63,13 @@ BR2_ROOTFS_POST_BUILD_SCRIPT = $(ROOT)/build/br-ext/board/nanopc-t6/post-build.s
 endif
 BR2_PACKAGE_LM_SENSORS = y
 BR2_PACKAGE_BASH = y
-
+BR2_PACKAGE_UTIL_LINUX = y
+BR2_PACKAGE_UTIL_LINUX_BINARIES = y
+BR2_PACKAGE_UTIL_LINUX_LSBLK = y
+BR2_PACKAGE_E2FSPROGS = y
+BR2_PACKAGE_E2FSPROGS_RESIZE2FS = y
+BR2_PACKAGE_GPTFDISK = y
+BR2_PACKAGE_GPTFDISK_SGDISK = y
 ################################################################################
 # Targets
 ################################################################################
@@ -228,7 +234,7 @@ clean: optee-os-clean
 rootfs-size-kib := $(shell echo $(BR2_TARGET_ROOTFS_EXT2_SIZE) | sed 's/M/*1024/')
 p5-end-kib := $(shell echo $$((12288 + $(rootfs-size-kib))))
 img-size-kib := $(shell echo $$(($(p5-end-kib) + 1024)))
-
+# 8F87B652-E901-4CA8-AD6B-1D78669286A0
 .PHONY: boot-img
 boot-img: u-boot buildroot $(LINUX_PATH)/arch/arm64/boot/Image.gz
 	mkdir -p $(BINARIES_PATH)
